@@ -1,7 +1,7 @@
 # wireguard-pia-portforward
 
 A heavily modified fork of https://github.com/thrnz/docker-wireguard-pia
-Allows the use of a 'gateway' VM for routing traffic through a Waireguard tunnel, while portforwarding to a specific host.
+Allows the use of a 'gateway' VM for routing traffic through a Wireguard tunnel, while portforwarding to a specific host.
 
 ## Requirements
 * The Wireguard kernel module must already be installed on the host.
