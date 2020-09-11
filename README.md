@@ -7,7 +7,7 @@ Allows the use of a 'gateway' VM for routing traffic through a Wireguard tunnel,
 ## Requirements
 * The Wireguard kernel module must already be installed on the host.
 * An active [PIA](https://www.privateinternetaccess.com) subscription.
-* A VM or PC with two interfaces; one Internet interface (Used to establishg the tunnel) and one VPN Network interface, used by other hosts to reach the Internet through the VM.
+* A VM or PC with two interfaces; one Internet interface (Used to establish the tunnel) and one VPN Network interface, used by other hosts to reach the Internet through the VM.
 
 ## Config
 The following ENV vars are written to the systemd service file:
