@@ -1,6 +1,7 @@
 # wireguard-pia-portforward
 
 A heavily modified fork of https://github.com/thrnz/docker-wireguard-pia
+
 Allows the use of a 'gateway' VM for routing traffic through a Wireguard tunnel, while portforwarding to a specific host.
 
 ## Requirements
@@ -34,12 +35,14 @@ The following ENV vars are written to the systemd service file:
 Install required packages:
 > apt install ca-certificates curl iptables jq openssl wireguard-tools resolvconf sshpass nmap python3
 
+
 Clone the repository:
 > git clone https://github.com/Brisppy/wireguard-pia-portforward
 
-mkdir /scripts
+> mkdir /scripts
 
 > mv ./wireguard-pia-portforward/* /scripts/
+
 
 Modify ENV variables and move vpn-gateway.service to /etc/systemd/service/
 > mv /scripts/wireguard-pia-portforward/vpn-gateway.service /etc/systemd/system/
@@ -47,12 +50,15 @@ Modify ENV variables and move vpn-gateway.service to /etc/systemd/service/
 Enable the service.
 > systemctl enable vpn-gateway
 
+
 Enable IP forwarding:
+
 Set net.ipv4.ip_forward (in /etc/sysctl.conf) to 1.
+
 
 Add the following iptables rules, substituting your own values:
 
-The ROUTED_* variables relate to the interface and network on which the vpn-gateway is connected to other hosts which will tunnel through it to the Internet.
+The ROUTED variables relate to the interface and network on which the vpn-gateway is connected to other hosts which will tunnel through it to the Internet.
 >  iptables -A FORWARD -s ROUTED_NETWORK -i ROUTED_INTERFACE -o wg0 -m conntrack --cstate NEW -j ACCEPT
 
 >  iptables -A FORWARD -m conntrack --cstate RELATED,ESTABLISHED -j ACCEPT
@@ -62,15 +68,17 @@ The ROUTED_* variables relate to the interface and network on which the vpn-gate
 Save iptables rules to file
 > iptables-save > /etc/iptables.rules
 
-Add a restore command to crontab
+Add an iptables restore command to crontab
 > @reboot USER    iptables-restore < /etc/iptables.rules
 
-# Make sure you update the Network configuration on connected hosts to use vpn_gateway as their default gateway.
 
 Permit execution of scripts:
 > chmod +x /scripts/*
 
-# OPTIONAL
+# Make sure to update the Network configuration on connected hosts to use vpn_gateway as their default gateway.
+
+
+# Optional
 If forwarding a port to a specific host:
 * SSH into the host to ensure it is working and the fingerprint is added.
 * Add the portforward-check.sh script to crontab.
@@ -80,9 +88,13 @@ If using mail notifications:
 * Modify ENV variables in the systemd service file.
 * Add Mail ENV variables to user account (/etc/environment or user profile).
 > MAIL_NOTIFY=1/0
+
 > MAILSERVER=
+
 > MAILPORT=
+
 > MAILUSER=
+
 > MAILPASS=
 
 ## Credits
