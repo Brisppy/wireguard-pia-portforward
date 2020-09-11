@@ -3,7 +3,6 @@ Description=Wireguard PIA VPN Gateway Service
 After=syslog.target network.target
 
 [Service]
-type=simple
 ExecStart=/scripts/run
 Restart=always
 RestartSec=10
@@ -17,9 +16,13 @@ Environment="PORT_FORWARDING="
 Environment="EXIT_ON_FATAL="
 Environment="LOCAL_INT="
 Environment="DESTHOST="
-Environment="GATEWAY="
 Environment="SEEDBOX_USER="
 Environment="SEEDBOX_PASS="
+Environment="MAIL_NOTIFY="
+Environment="MAILSERVER="
+Environment="MAILPORT="
+Environment="MAILUSER="
+Environment="MAILPORT="
 
 [Install]
 WantedBy=multi-user.target

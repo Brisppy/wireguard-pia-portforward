@@ -227,7 +227,7 @@ port_forward () {
         iptables -A PREROUTING -t nat -i wg0 -p tcp --dport $new_port -j DNAT --to $DESTHOST:$new_port
         iptables -A FORWARD -p tcp -d $DESTHOST --dport $new_port -j ACCEPT
         echo "$(date): Allowing incoming traffic on port $new_port"
-        python3 /scripts/python-mail-notifier 'mailserver' port 'maillogin' 'mailpass' 'subject' >> /dev/null
+        [ $MAIL_NOTIFY -eq 1 ] && python3 /scripts/python-mail-notifier/python-mail-notifier.py '$MAILSERVER' $MAILPORT '$MAILUSER' '$MAILPASS' 'WG VPN Port Forwarding Successful' 'Port $new_port forwarded to $DESTHOST:$new_port.' >> /dev/null
         pf_port="$new_port"
       fi
     fi
