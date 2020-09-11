@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Check the status of the port with nmap.
+LOCAL_INT=CHANGEME
 PORT=$(cat /pia-shared/port.dat)
 WANIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
-LOCALIP=$(ip -f inet addr show ens192 | sed -En -e 's/.*inet ([0-9.]+).*/\1/p')
+LOCALIP=$(ip -f inet addr show $LOCAL_INT | sed -En -e 's/.*inet ([0-9.]+).*/\1/p')
 STATUS=0
 
 echo $(date)
