@@ -32,31 +32,26 @@ The following ENV vars are written to the systemd service file:
 |```MAILPASS=```|Password for mail server account.
 
 ## Install
-Install required packages:
+### Install required packages:
 > apt install ca-certificates curl iptables jq openssl wireguard-tools resolvconf sshpass nmap python3
 
-
-Clone the repository:
+### Clone the repository:
 > git clone https://github.com/Brisppy/wireguard-pia-portforward
 
 > mkdir /scripts
 
 > mv ./wireguard-pia-portforward/* /scripts/
 
-
-Modify ENV variables and move vpn-gateway.service to /etc/systemd/service/
+### Modify ENV variables and move vpn-gateway.service to /etc/systemd/service/
 > mv /scripts/wireguard-pia-portforward/vpn-gateway.service /etc/systemd/system/
 
-Enable the service.
 > systemctl enable vpn-gateway
 
-
-Enable IP forwarding:
+### Enable IP forwarding:
 
 Set net.ipv4.ip_forward (in /etc/sysctl.conf) to 1.
 
-
-Add the following iptables rules, substituting your own values:
+### Add the following iptables rules, substituting your own values:
 
 The ROUTED variables relate to the interface and network on which the vpn-gateway is connected to other hosts which will tunnel through it to the Internet.
 >  iptables -A FORWARD -s ROUTED_NETWORK -i ROUTED_INTERFACE -o wg0 -m conntrack --cstate NEW -j ACCEPT
@@ -71,12 +66,10 @@ Save iptables rules to file
 Add an iptables restore command to crontab
 > @reboot USER    iptables-restore < /etc/iptables.rules
 
-
 Permit execution of scripts:
 > chmod +x /scripts/*
 
-# Make sure to update the Network configuration on connected hosts to use vpn_gateway as their default gateway.
-
+### Make sure to update the Network configuration on connected hosts to use vpn_gateway as their default gateway.
 
 # Optional
 If forwarding a port to a specific host:
