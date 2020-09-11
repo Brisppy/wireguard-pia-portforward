@@ -18,13 +18,64 @@ The following ENV vars are written to the systemd service file:
 |```USEMODERN=0/1```| Set this to 1 to use the '[next gen](https://www.privateinternetaccess.com/blog/private-internet-access-next-generation-network-now-available-for-beta-preview/)' network, or 0 to use the classic/legacy network. This must be set to 1 for ```PORT_FORWARDING``` to function. Defaults to 1 if not specified.
 |```KEEPALIVE=25```|If defined, PersistentKeepalive will be set to this in the Wireguard config.
 |```VPNDNS=8.8.8.8, 8.8.4.4```|Use these DNS servers in the Wireguard config. Defaults to PIA's DNS servers if not specified.
-|```PORT_FORWARDING=0/1```|Whether to enable port forwarding. Requires ```USEMODERN=1``` and a supported server. Defaults to 0 if not specified. The forwarded port number is dumped to ```/pia-shared/port.dat``` for possible access by scripts in other containers.
+|```PORT_FORWARDING=0/1```|Whether to enable port forwarding. Requires ```USEMODERN=1``` and a supported server. Defaults to 0 if not specified. The forwarded port number is dumped to ```/pia-shared/port.dat``` and then pushed to another host via SSH.
 |```EXIT_ON_FATAL=0/1```|There is no error recovery logic at this stage. If something goes wrong we simply go to sleep. By default the container will continue running until manually stopped. Set this to 1 to force the container to exit when an error occurs. Exiting on an error may not be desirable behavior if other containers are sharing the connection.
 |```LOCAL_INT=```|Interface used to reach the Internet.
 |```DESTHOST=```|IP address of the seedbox.
-|```GATEWAY=```|IP address of the default gateway used to reach the Internet.
 |```SEEDBOX_USER=```|Username for account which writes new port on seedbox host.
 |```SEEDBOX_PASS=```|Password for account which writes new port on seedbox host.
+|```MAIL_NOTIFY=1/0```|Sets whether an email is sent on success or failure of portforward. (STARTTLS SMTP SERVERS ONLY)
+|```MAILSERVER=```|IP or FQDN of mail server.
+|```MAILPORT=```|Port used to connect to mails server.
+|```MAILUSER=```|Username for mail server account.
+|```MAILPASS=```|Password for mail server account.
+
+## Install
+Install required packages:
+> apt install ca-certificates curl iptables jq openssl wireguard-tools resolvconf sshpass nmap python3
+
+Clone the repository:
+> git clone https://github.com/Brisppy/wireguard-pia-portforward
+mkdir /scripts
+> mv ./wireguard-pia-portforward/* /scripts/
+
+Modify ENV variables and move vpn-gateway.service to /etc/systemd/service/
+> mv /scripts/wireguard-pia-portforward/vpn-gateway.service /etc/systemd/system/
+Enable the service.
+> systemctl enable vpn-gateway
+
+Enable IP forwarding:
+Set net.ipv4.ip_forward (in /etc/sysctl.conf) to 1.
+
+Add the following iptables rules, substituting your own values:
+The ROUTED_* variables relate to the interface and network on which the vpn-gateway is connected to other hosts which will tunnel through it to the Internet.
+>  iptables -A FORWARD -s ROUTED_NETWORK -i ROUTED_INTERFACE -o wg0 -m conntrack --cstate NEW -j ACCEPT
+>  iptables -A FORWARD -m conntrack --cstate RELATED,ESTABLISHED -j ACCEPT
+>  iptables -A POSTROUTING -o wg0 -j MASQUERADE
+Save iptables rules to file
+> iptables-save > /etc/iptables.rules
+Add a restore command to crontab
+> @reboot USER    iptables-restore < /etc/iptables.rules
+
+# Make sure you update the Network configuration on connected hosts to use vpn_gateway as their default gateway.
+
+Permit execution of scripts:
+> chmod +x /scripts/*
+
+# OPTIONAL
+If forwarding a port to a specific host:
+* SSH into the host to ensure it is working and the fingerprint is added.
+* Add the portforward-check.sh script to crontab.
+> @hourly USER    /scripts/portforward-check.sh >> /var/log/portforward-check.log
+
+If using mail notifications:
+* Modify ENV variables in the systemd service file.
+* Add Mail ENV variables to user account (/etc/environment or user profile).
+> MAIL_NOTIFY=1/0
+> MAILSERVER=
+> MAILPORT=
+> MAILUSER=
+> MAILPASS=
 
 ## Credits
 Some bits and pieces and ideas have been borrowed from the following:
