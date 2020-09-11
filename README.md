@@ -67,7 +67,7 @@ Add an iptables restore command to crontab
 > @reboot USER    iptables-restore < /etc/iptables.rules
 
 Permit execution of scripts:
-> chmod +x /scripts/*
+> chmod +x /scripts/* -R
 
 ### Make sure to update the Network configuration on connected hosts to use vpn_gateway as their default gateway.
 
