@@ -196,8 +196,8 @@ while true; do
     echo "$(date): Rebind interval: $pf_bindinterval seconds"
     # Dump port here if requested
     [ -n "$portfile" ] && echo "$(date): Port dumped to $portfile" && echo $pf_port > "$portfile"
-    echo "$(date): Sending new port to forward host"
-    echo $pf_port | sshpass -p "$FORWARD_PASS" ssh -o StrictHostKeyChecking=no $FORWARD_USER@$FORWARD_HOST "cat > port"
+    [ $PUSH_PORT -eq 1 ] && echo "$(date): Sending new port to forward host"
+    [ $PUSH_PORT -eq 1 ] && echo $pf_port | sshpass -p "$FORWARD_PASS" ssh -o StrictHostKeyChecking=no $FORWARD_USER@$FORWARD_HOST "cat > port"
   fi
   sleep $pf_bindinterval &
   wait $!

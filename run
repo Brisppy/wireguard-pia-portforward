@@ -219,13 +219,13 @@ port_forward () {
       local new_port=$(cat "$PORTFILE")
       if [ "$pf_port" -ne "$new_port" ]; then
         if [ $pf_firstrun -ne 1 ]; then
-          iptables -D PREROUTING -t nat -i wg0 -p tcp --dport $new_port -j DNAT --to $FORWARD_HOST:$new_port
-          iptables -D FORWARD -p tcp -d $FORWARD_HOST --dport $new_port -j ACCEPT
+          [ $PUSH_PORT -eq 1 ] && iptables -D PREROUTING -t nat -i wg0 -p tcp --dport $new_port -j DNAT --to $FORWARD_HOST:$new_port
+          [ $PUSH_PORT -eq 1 ] && iptables -D FORWARD -p tcp -d $FORWARD_HOST --dport $new_port -j ACCEPT
           echo "$(date): Closing old port"
           pf_firstrun=0
         fi
-        iptables -A PREROUTING -t nat -i wg0 -p tcp --dport $new_port -j DNAT --to $FORWARD_HOST:$new_port
-        iptables -A FORWARD -p tcp -d $FORWARD_HOST --dport $new_port -j ACCEPT
+        [ $PUSH_PORT -eq 1 ] && iptables -A PREROUTING -t nat -i wg0 -p tcp --dport $new_port -j DNAT --to $FORWARD_HOST:$new_port
+        [ $PUSH_PORT -eq 1 ] && iptables -A FORWARD -p tcp -d $FORWARD_HOST --dport $new_port -j ACCEPT
         echo "$(date): Allowing incoming traffic on port $new_port"
         [ $MAIL_NOTIFY -eq 1 ] && python3 /scripts/python-mail-notifier/python-mail-notifier.py '$MAILSERVER' $MAILPORT '$MAILUSER' '$MAILPASS' 'WG VPN Port Forwarding Successful' 'Port $new_port forwarded to $FORWARD_HOST:$new_port.' >> /dev/null
         pf_port="$new_port"
