@@ -52,45 +52,33 @@ mv /scripts/wireguard-pia-portforward/vpn-gateway.service /etc/systemd/system/
 systemctl enable vpn-gateway
 ```
 
-### Enable IP forwarding:
-
-Set net.ipv4.ip_forward (in /etc/sysctl.conf) to 1.
-
-### Add the following iptables rules, substituting your own values:
-
-The ROUTED variables relate to the interface and network on which the vpn-gateway is connected to other hosts which will tunnel through it to the Internet.
+# Optional
+### If using port forwarding:
+* Set net.ipv4.ip_forward (in /etc/sysctl.conf) to 1.
+* Add the following iptables rules, replacing the $ROUTED variables with the interface and network on which the vpn-gateway is connected to other hosts which will tunnel through it to the Internet.
 ```
-iptables -A FORWARD -s ROUTED_NETWORK -i ROUTED_INTERFACE -o wg0 -m conntrack --cstate NEW -j ACCEPT
+iptables -A FORWARD -s $ROUTED_NETWORK -i $ROUTED_INTERFACE -o wg0 -m conntrack --cstate NEW -j ACCEPT
 iptables -A FORWARD -m conntrack --cstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A POSTROUTING -o wg0 -j MASQUERADE
 ```
-
-Save iptables rules to file
+* Save iptables rules to file
 ```
 iptables-save > /etc/iptables.rules
 ```
-
-Add an iptables restore command to crontab
+* Add an iptables restore command to crontab
 ```
 @reboot USER    iptables-restore < /etc/iptables.rules
 ```
+### MAKE SURE YOU CHANGE THE HOST NETWORK CONFIGURATION TO USE THE VPN_INTERFACE AS THEIR DEFAULT GATEWAY
 
-Permit execution of scripts:
-```
-chmod +x /scripts/* -R
-```
-
-### Make sure to update the Network configuration on connected hosts to use vpn_gateway as their default gateway.
-
-# Optional
-If using port forwarding, but not using the provided PUSH_PORT function:
+### If using port forwarding, but not using the provided PUSH_PORT function:
 * After port forwarding is activated, you will need to add some iptables rules to forward the port to a specific host, replacing the $VARIABLEs with your own values.
 ```
 iptables -A PREROUTING -t nat -i wg0 -p tcp --dport $FORWARDED_PORT -j DNAT --to $FORWARD_HOST:$FORWARDED_PORT
 iptables -A FORWARD -p tcp -d $FORWARD_HOST --dport $FORWARDED_PORT -j ACCEPT
 ```
 
-If forwarding a port to a specific host:
+### If forwarding a port to a specific host with the PUSH_PORT function:
 * Set PUSH_PORT to 1
 * SSH into the host to ensure it is working and the fingerprint is added.
 * Modify the LOCAL_INT variable of portforward.sh (Line 4) to be the Internet-connected interface (e.g eth0).
@@ -99,7 +87,7 @@ If forwarding a port to a specific host:
 @hourly USER    /scripts/portforward-check.sh >> /var/log/portforward-check.log
 ```
 
-If using mail notifications:
+### If using mail notifications:
 * Modify ENV variables in the systemd service file.
 * Add Mail ENV variables to user account (/etc/environment or user profile).
 ```
