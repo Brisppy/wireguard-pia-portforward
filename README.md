@@ -80,6 +80,13 @@ chmod +x /scripts/* -R
 ### Make sure to update the Network configuration on connected hosts to use vpn_gateway as their default gateway.
 
 # Optional
+If using port forwarding, but not using the provided PUSH_PORT function:
+* After port forwarding is activated, you will need to add some iptables rules to forward the port to a specific host, replacing the $VARIABLEs with your own values.
+```
+iptables -A PREROUTING -t nat -i wg0 -p tcp --dport $FORWARDED_PORT -j DNAT --to $FORWARD_HOST:$FORWARDED_PORT
+iptables -A FORWARD -p tcp -d $FORWARD_HOST --dport $FORWARDED_PORT -j ACCEPT
+```
+
 If forwarding a port to a specific host:
 * Set PUSH_PORT to 1
 * SSH into the host to ensure it is working and the fingerprint is added.
