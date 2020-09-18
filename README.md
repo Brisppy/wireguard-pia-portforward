@@ -4,6 +4,9 @@ A heavily modified fork of https://github.com/thrnz/docker-wireguard-pia
 
 Allows the use of a 'gateway' VM for routing traffic through a Wireguard tunnel, while portforwarding to a specific host.
 
+### WHY?
+The benefit of using a VM for this purpose is that it allows you to seamlessly route data over the VPN tunnel from inside of you own network, requiring ZERO configuraiton on end devices. You can even assign a VLAN to a wireless ntwork and route wifi devices through the tunnel. Another option is of course to connect other VMs or computers to the VPN network.
+
 ## Requirements
 * The Wireguard kernel module must already be installed on the host.
 * An active [PIA](https://www.privateinternetaccess.com) subscription.
