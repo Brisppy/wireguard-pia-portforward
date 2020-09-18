@@ -36,16 +36,17 @@ The following ENV vars are written to the systemd service file:
 > apt install ca-certificates curl iptables jq openssl wireguard-tools resolvconf sshpass nmap python3
 
 ### Clone the repository:
-> git clone https://github.com/Brisppy/wireguard-pia-portforward
-
-> mkdir /scripts
-
-> mv ./wireguard-pia-portforward/* /scripts/
+```
+git clone https://github.com/Brisppy/wireguard-pia-portforward
+mkdir /scripts
+mv ./wireguard-pia-portforward/* /scripts/
+```
 
 ### Modify ENV variables and move vpn-gateway.service to /etc/systemd/service/
-> mv /scripts/wireguard-pia-portforward/vpn-gateway.service /etc/systemd/system/
-
-> systemctl enable vpn-gateway
+```
+mv /scripts/wireguard-pia-portforward/vpn-gateway.service /etc/systemd/system/
+systemctl enable vpn-gateway
+```
 
 ### Enable IP forwarding:
 
@@ -54,11 +55,11 @@ Set net.ipv4.ip_forward (in /etc/sysctl.conf) to 1.
 ### Add the following iptables rules, substituting your own values:
 
 The ROUTED variables relate to the interface and network on which the vpn-gateway is connected to other hosts which will tunnel through it to the Internet.
->  iptables -A FORWARD -s ROUTED_NETWORK -i ROUTED_INTERFACE -o wg0 -m conntrack --cstate NEW -j ACCEPT
-
->  iptables -A FORWARD -m conntrack --cstate RELATED,ESTABLISHED -j ACCEPT
-
->  iptables -A POSTROUTING -o wg0 -j MASQUERADE
+```
+iptables -A FORWARD -s ROUTED_NETWORK -i ROUTED_INTERFACE -o wg0 -m conntrack --cstate NEW -j ACCEPT
+iptables -A FORWARD -m conntrack --cstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A POSTROUTING -o wg0 -j MASQUERADE
+```
 
 Save iptables rules to file
 > iptables-save > /etc/iptables.rules
@@ -81,15 +82,13 @@ If forwarding a port to a specific host:
 If using mail notifications:
 * Modify ENV variables in the systemd service file.
 * Add Mail ENV variables to user account (/etc/environment or user profile).
-> MAIL_NOTIFY=1/0
-
-> MAILSERVER=
-
-> MAILPORT=
-
-> MAILUSER=
-
-> MAILPASS=
+```
+MAIL_NOTIFY=1/0
+MAILSERVER=
+MAILPORT=
+MAILUSER=
+MAILPASS=
+```
 
 ## Credits
 Some bits and pieces and ideas have been borrowed from the following:
