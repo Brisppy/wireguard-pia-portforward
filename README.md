@@ -84,7 +84,7 @@ iptables -A FORWARD -p tcp -d $FORWARD_HOST --dport $FORWARDED_PORT -j ACCEPT
 * Modify the LOCAL_INT variable of portforward.sh (Line 4) to be the Internet-connected interface (e.g eth0).
 * Add the portforward-check.sh script to crontab.
 ```
-@hourly USER    /scripts/portforward-check.sh >> /var/log/portforward-check.log
+@hourly USER    /scripts/wireguard-pia-portforward/portforward-check.sh >> /var/log/portforward-check.log
 ```
 
 ### If using mail notifications:
