@@ -62,13 +62,19 @@ iptables -A POSTROUTING -o wg0 -j MASQUERADE
 ```
 
 Save iptables rules to file
-> iptables-save > /etc/iptables.rules
+```
+iptables-save > /etc/iptables.rules
+```
 
 Add an iptables restore command to crontab
-> @reboot USER    iptables-restore < /etc/iptables.rules
+```
+@reboot USER    iptables-restore < /etc/iptables.rules
+```
 
 Permit execution of scripts:
-> chmod +x /scripts/* -R
+```
+chmod +x /scripts/* -R
+```
 
 ### Make sure to update the Network configuration on connected hosts to use vpn_gateway as their default gateway.
 
@@ -77,7 +83,9 @@ If forwarding a port to a specific host:
 * SSH into the host to ensure it is working and the fingerprint is added.
 * Modify the LOCAL_INT variable of portforward.sh (Line 4) to be the Internet-connected interface (e.g eth0).
 * Add the portforward-check.sh script to crontab.
-> @hourly USER    /scripts/portforward-check.sh >> /var/log/portforward-check.log
+```
+@hourly USER    /scripts/portforward-check.sh >> /var/log/portforward-check.log
+```
 
 If using mail notifications:
 * Modify ENV variables in the systemd service file.
