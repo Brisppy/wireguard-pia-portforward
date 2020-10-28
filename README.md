@@ -44,7 +44,7 @@ mv ./wireguard-pia-portforward/ /scripts/
 mv /scripts/wireguard-pia-portforward/scripts/* /scripts/
 ```
 
-### Modify ENV variables and move vpn-gateway.service to /etc/systemd/service/
+### Modify ENV variables within override.conf and move vpn-gateway.service to /etc/systemd/service/.
 ```
 mv /scripts/wireguard-pia-portforward/vpn-gateway.service /etc/systemd/system/
 mv /scripts/wireguard-pia-portforward/vpn-gateway.service.d /etc/systemd/system/
