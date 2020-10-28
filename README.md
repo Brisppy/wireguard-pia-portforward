@@ -4,6 +4,8 @@ A heavily modified fork of https://github.com/thrnz/docker-wireguard-pia
 
 Allows the use of a 'gateway' VM for routing traffic through a Wireguard tunnel, while portforwarding to a specific host.
 
+**A little note: some of the documentation and script mdofications were done at separate points and may be inaccurate, if something doesn't work or there are any issues / inconsistencies, please let me know.**
+
 ### WHY?
 The benefit of using a VM for this purpose is that it allows you to seamlessly route data over the VPN tunnel from inside of you own network, requiring ZERO configuraiton on end devices. You can even assign a VLAN to a wireless ntwork and route wifi devices through the tunnel. Another option is of course to connect other VMs or computers to the VPN network.
 
@@ -13,7 +15,7 @@ The benefit of using a VM for this purpose is that it allows you to seamlessly r
 * A VM or PC with two interfaces; one Internet interface (Used to establish the tunnel) and one VPN Network interface, used by other hosts to reach the Internet through the VM.
 
 ## Config
-The following ENV vars are written to the systemd service file:
+The following ENV vars are written to the systemd service override file:
 
 | ENV Var | Function |
 |-------|------|
@@ -29,31 +31,28 @@ The following ENV vars are written to the systemd service file:
 |```FORWARD_HOST=```|OPTIONAL: IP address of the forwarded host.
 |```FORWARD_USER=```|OPTIONAL: Username for account which writes new port on forward host.
 |```FORWARD_PASS=```|OPTIONAL: Password for account which writes new port on forward host.
-|```MAIL_NOTIFY=0/1```|OPTIONAL: Sets whether an email is sent on success or failure of portforward. (STARTTLS SMTP SERVERS ONLY)
-|```MAILSERVER=```|OPTIONAL: IP or FQDN of mail server.
-|```MAILPORT=```|OPTIONAL: Port used to connect to mail server.
-|```MAILUSER=```|OPTIONAL: Username for mail server account.
-|```MAILPASS=```|OPTIONAL: Password for mail server account.
 
 ## Install
 ### Install required packages:
-> apt install ca-certificates curl iptables jq openssl wireguard-tools resolvconf sshpass nmap python3
+> apt install ca-certificates curl iptables jq openssl wireguard-tools resolvconf sshpass python3
 
 ### Clone the repository:
 ```
 git clone https://github.com/Brisppy/wireguard-pia-portforward
 mkdir /scripts
 mv ./wireguard-pia-portforward/ /scripts/
+mv /scripts/wireguard-pia-portforward/scripts/* /scripts/
 ```
 
 ### Modify ENV variables and move vpn-gateway.service to /etc/systemd/service/
 ```
 mv /scripts/wireguard-pia-portforward/vpn-gateway.service /etc/systemd/system/
+mv /scripts/wireguard-pia-portforward/vpn-gateway.service.d /etc/systemd/system/
 systemctl enable vpn-gateway
 ```
 
 # Optional
-### If using port forwarding:
+### If you are routing other traffic through the VM:
 * Set net.ipv4.ip_forward (in /etc/sysctl.conf) to 1.
 * Add the following iptables rules, replacing the $ROUTED variables with the interface and network on which the vpn-gateway is connected to other hosts which will tunnel through it to the Internet.
 ```
@@ -67,36 +66,18 @@ iptables-save > /etc/iptables.rules
 ```
 * Add an iptables restore command to crontab
 ```
-@reboot USER    iptables-restore < /etc/iptables.rules
-```
-### MAKE SURE YOU CHANGE THE HOST NETWORK CONFIGURATION TO USE THE VPN_INTERFACE AS THEIR DEFAULT GATEWAY
-
-### If using port forwarding, but not using the provided PUSH_PORT function:
-* After port forwarding is activated, you will need to add some iptables rules to forward the port to a specific host, replacing the $VARIABLEs with your own values.
-```
-iptables -A PREROUTING -t nat -i wg0 -p tcp --dport $FORWARDED_PORT -j DNAT --to $FORWARD_HOST:$FORWARDED_PORT
-iptables -A FORWARD -p tcp -d $FORWARD_HOST --dport $FORWARDED_PORT -j ACCEPT
+@reboot root    iptables-restore < /etc/iptables.rules
 ```
 
 ### If forwarding a port to a specific host with the PUSH_PORT function:
-* Set PUSH_PORT to 1
 * SSH into the host to ensure it is working and the fingerprint is added.
-* Modify the LOCAL_INT variable of portforward.sh (Line 4) to be the Internet-connected interface (e.g eth0).
-* Add the portforward-check.sh script to crontab.
-```
-@hourly USER    /scripts/portforward-check.sh >> /var/log/portforward-check.log
-```
+* The port can then be grabbed from the HOME directory of the SSH user in a file named 'port'.
 
-### If using mail notifications:
-* Modify ENV variables in the systemd service file.
-* Add Mail ENV variables to user account (/etc/environment or user profile).
-```
-MAIL_NOTIFY=1/0
-MAILSERVER=
-MAILPORT=
-MAILUSER=
-MAILPASS=
-```
+## Automatically check if port is forwarded:
+* Modify the 'portforward_check.sh' LOCAL_INT variable to one which can reach the Internet outside of the tunnel.
+* Create a crontab entry
+
+```@hourly  root    /scripts/portforward-check.sh >> /var/log/portforward-check.log
 
 ## Credits
 Some bits and pieces and ideas have been borrowed from the following:

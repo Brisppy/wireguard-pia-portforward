@@ -1,28 +1,13 @@
 [Unit]
 Description=Wireguard PIA VPN Gateway Service
 After=syslog.target network.target
-
 [Service]
-ExecStart=/scripts/run
+User=root
+Group=root
+type=simple
+ExecStart=/opt/wireguard-pia-portforward/run
 Restart=always
 RestartSec=10
-Environment="LOC=xxx"
-Environment="USER=pxxxxxxx"
-Environment="PASS=xxxxxxxx"
-Environment="USEMODERN=1"
-Environment="KEEPALIVE=25"
-Environment="VPNDNS=1.1.1.1, 1.0.0.1"
-Environment="PORT_FORWARDING=0"
-Environment="EXIT_ON_FATAL=1"
-Environment="PUSH_PORT=0"
-Environment="FORWARD_HOST=x.x.x.x"
-Environment="FORWARD_USER=xxx"
-Environment="FORWARD_PASS=xxx"
-Environment="MAIL_NOTIFY=0"
-Environment="MAILSERVER=x.x.x.x"
-Environment="MAILPORT=xxx"
-Environment="MAILUSER=xxx"
-Environment="MAILPORT=xxx"
 
 [Install]
 WantedBy=multi-user.target
