@@ -28,20 +28,9 @@ The following ENV vars are written to the systemd service override file:
 |```PORT_FORWARDING=0/1```|Whether to enable port forwarding. Requires ```USEMODERN=1``` and a supported server. Defaults to 0 if not specified. The forwarded port number is dumped to ```/pia-shared/port.dat``` and then pushed to another host via SSH.
 |```EXIT_ON_FATAL=0/1```|There is no error recovery logic at this stage. If something goes wrong we simply go to sleep. By default the container will continue running until manually stopped. Set this to 1 to force the container to exit when an error occurs. Exiting on an error may not be desirable behavior if other containers are sharing the connection.
 |```PUSH_PORT=0/1```|If you wish to automatically forward a port, change to 1.
-<<<<<<< HEAD
 |```FORWARD_HOST=```|OPTIONAL: IP address of the forwarded host.
 |```FORWARD_USER=```|OPTIONAL: Username for account which writes new port on forward host.
 |```FORWARD_PASS=```|OPTIONAL: Password for account which writes new port on forward host.
-=======
-|```FORWARD_HOST=x.x.x.x```|OPTIONAL: IP address of the forwarded host.
-|```FORWARD_USER=xxx```|OPTIONAL: Username for account which writes new port on forward host.
-|```FORWARD_PASS=xxx```|OPTIONAL: Password for account which writes new port on forward host.
-|```MAIL_NOTIFY=0/1```|OPTIONAL: Sets whether an email is sent on success or failure of portforward. (STARTTLS SMTP SERVERS ONLY)
-|```MAILSERVER=x.x.x.x```|OPTIONAL: IP or FQDN of mail server.
-|```MAILPORT=xxx```|OPTIONAL: Port used to connect to mail server.
-|```MAILUSER=xxx```|OPTIONAL: Username for mail server account.
-|```MAILPASS=xxx```|OPTIONAL: Password for mail server account.
->>>>>>> 4477b6bd1717be791b6366404c1b1cf3ed034a4b
 
 ## Install
 ### Install required packages:
@@ -82,15 +71,7 @@ iptables-save > /etc/iptables.rules
 
 ### If forwarding a port to a specific host with the PUSH_PORT function:
 * SSH into the host to ensure it is working and the fingerprint is added.
-<<<<<<< HEAD
 * The port can then be grabbed from the HOME directory of the SSH user in a file named 'port'.
-=======
-* Modify the LOCAL_INT variable of portforward.sh (Line 4) to be the Internet-connected interface (e.g eth0).
-* Add the portforward-check.sh script to crontab.
-```
-@hourly USER    /scripts/wireguard-pia-portforward/portforward-check.sh >> /var/log/portforward-check.log
-```
->>>>>>> 4477b6bd1717be791b6366404c1b1cf3ed034a4b
 
 ## Automatically check if port is forwarded:
 * Modify the 'portforward_check.sh' LOCAL_INT variable to one which can reach the Internet outside of the tunnel.
