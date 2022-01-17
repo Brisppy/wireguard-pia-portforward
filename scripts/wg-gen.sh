@@ -99,7 +99,7 @@ verify_serverlist ()
 get_servers() {
   echo "Fetching next-gen PIA server list"
   curl --silent --show-error --max-time "$curl_max_time" \
-              "https://serverlist.piaservers.net/vpninfo/servers/new" > "$servers_raw"
+              "https://serverlist.piaservers.net/vpninfo/servers/v4" > "$servers_raw"
   head -n 1 "$servers_raw" | tr -d '\n' > "$servers_json"
   tail -n +3 "$servers_raw" | base64 -d > "$servers_sig"
   [ -n "$pia_pubkey" ] && verify_serverlist
